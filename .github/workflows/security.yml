@@ -1,0 +1,35 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 3 * * 0'
+
+jobs:
+  bandit:
+    name: Bandit Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install bandit
+        run: pip install bandit
+      
+      - name: Run Bandit security scan
+        run: bandit -r . -f json -o bandit-report.json
+        continue-on-error: true
+      
+      - name: Upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: bandit-results
+          path: bandit-report.json
+        if: always()

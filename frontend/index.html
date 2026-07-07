@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://db.onlinewebfonts.com/c/04e6981992c0e2e7642af2074ebe3901?family=Helvetica+Now+Display+Bold" rel="stylesheet" type="text/css"/>
+    <title>Polymer Informatics | Materials Discovery Engine</title>
+  </head>
+  <body>
+    <div id="error-log" style="color: red; position: fixed; top: 10px; left: 10px; z-index: 9999; font-family: monospace; white-space: pre-wrap; pointer-events: none;"></div>
+    <script>
+      window.addEventListener('error', function(event) {
+        document.getElementById('error-log').innerText += event.error ? event.error.stack : event.message + '\n';
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        document.getElementById('error-log').innerText += 'Unhandled promise rejection: ' + event.reason + '\n';
+      });
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

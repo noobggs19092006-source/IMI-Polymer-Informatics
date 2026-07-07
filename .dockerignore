@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+.tox/
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+dist/
+build/
+.venv/
+venv/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Project specific
+*.log
+temp_data/
+simulation_results/
+.env
+.env.local
+secrets/
+
+# CI/CD
+.github/workflows/
+.gitlab-ci.yml
+
+# Documentation
+docs/
+README.md
+CHANGELOG.md
+
+# Large files
+*.pkl
+*.pth
+*.h5
+data/raw/

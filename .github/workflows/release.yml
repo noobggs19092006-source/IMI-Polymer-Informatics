@@ -1,0 +1,40 @@
+name: Automated Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Get version from tag
+        id: tag_name
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+      - name: Check if CHANGELOG exists
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            # Extract release notes for this version
+            VERSION=${{ steps.tag_name.outputs.VERSION }}
+            sed -n "/^## \[${VERSION#v}\]/,/^## \[/p" CHANGELOG.md > release_notes.txt
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.tag_name.outputs.VERSION }}
+          body_path: ${{ steps.changelog.outputs.exists == 'true' && 'release_notes.txt' || '' }}
+          draft: false
+          prerelease: ${{ contains(steps.tag_name.outputs.VERSION, 'alpha') || contains(steps.tag_name.outputs.VERSION, 'beta') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

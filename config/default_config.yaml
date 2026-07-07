@@ -1,0 +1,40 @@
+ansys:
+  # ⚠️ STUDENT EDITION: Set max_parallel_jobs to 1
+  # Commercial Edition: Can use 4-8 (depends on license)
+  max_parallel_jobs: 1  # ← MUST be 1 for Student Edition
+  
+  # Note: Student Ansys has 32,000 node limit per simulation
+  # Larger geometries will fail. See README.md
+  
+  job_timeout_minutes: 60
+  
+  # Student Edition additional limits:
+  # - Single-threaded only (no parallelism)
+  # - Max iterations: 10,000
+  # - License expires after 12 months
+  # - Non-commercial use only
+  
+  version: "2024"
+  license_server: ansyslicense.company.com
+  license_port: 1055
+
+paths:
+  working_directory: ./work
+  temp_directory: ~/.polymerinfo/temp
+  output_directory: ./results
+  log_directory: ./logs
+  data_directory: ./data
+
+simulation:
+  max_retries: 3
+  retry_backoff_seconds: 5
+
+dataset_management:
+  min_samples_per_material_class: 100
+  stratified_cv_required: true
+
+logging:
+  level_file: DEBUG
+  level_console: INFO
+  enable_rotation: true
+  file_max_bytes: 10485760

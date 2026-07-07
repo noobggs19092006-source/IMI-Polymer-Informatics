@@ -1,0 +1,27 @@
+# Node.js
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.tmp/
+*.log
+npm-debug.log*
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.venv/
+env/
+venv/
+ENV/
+
+# OS/Editors
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  ml-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.ml
+    volumes:
+      # Mount runtime directories so results persist on the host.
+      # These directories will be created automatically by Docker.
+      - ./results:/app/results
+      - ./logs:/app/logs
+      - ./graphs:/app/graphs
+      - ./files:/app/files
+    environment:
+      - CONFIG_FILE=/app/config/production_config.yaml
+      - LOG_LEVEL=INFO
+      - PYTHONHASHSEED=42
+      - PYTHONPATH=/app
+    command: python main.py --mode=ml
+
+  # ── Ansys Simulation (Optional — runs on host, not in Docker) ─────────────
+  # Ansys requires a physical Windows/Linux license. Run directly on host:
+  #   python codes/code_12_ansys_sweep.py
+  # The results CSV will be picked up by the ml-pipeline container via ./results.
