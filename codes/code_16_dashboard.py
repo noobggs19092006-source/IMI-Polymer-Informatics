@@ -1,4 +1,6 @@
 """
+from codes.reproducibility import enforce_reproducibility
+enforce_reproducibility(42)
 code_16_dashboard.py — Streamlit Polymer Inverse Design Dashboard.
 
 Imports BACKBONES, LEFT_GROUPS, RIGHT_GROUPS from constants.py (single source

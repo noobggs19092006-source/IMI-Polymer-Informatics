@@ -6,16 +6,21 @@ import subprocess
 import sys
 import os
 import time
+import logging
+from codes.logger_setup import PipelineLogger
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 def print_header(title):
-    print("\n" + "=" * 80)
-    print(f"  {title}")
-    print("=" * 80)
+    logger.info("\n" + "=" * 80)
+    logger.info("  %s", title)
+    logger.info("=" * 80)
 
 def run_command(command, description):
-    print(f"\n🚀 Starting: {description}")
-    print(f"💻 Command:  {' '.join(command)}")
-    print("-" * 80)
+    logger.info("\n🚀 Starting: %s", description)
+    logger.info("💻 Command:  %s", ' '.join(command))
+    logger.info("-" * 80)
     
     # Use subprocess.Popen to stream the output interactively
     try:
@@ -30,23 +35,21 @@ def run_command(command, description):
         process.wait()
         
         if process.returncode != 0:
-            print(f"\n❌ Error: Step failed with exit code {process.returncode}")
+            logger.error("\n❌ Error: Step failed with exit code %d", process.returncode)
             return False
-        
-        print(f"\n✅ Successfully completed: {description}")
+        else:
+            logger.info("\n✅ Successfully completed: %s", description)
         return True
     except KeyboardInterrupt:
-        print("\n⚠️ Process interrupted by user.")
-        process.terminate()
+        logger.warning("\n⚠️ Process interrupted by user.")
         return False
     except Exception as e:
-        print(f"\n❌ Failed to run command: {e}")
+        logger.error("\n❌ Failed to run command: %s", e)
         return False
 
 def main():
     print_header("PHYSICS-INFORMED POLYMER INFORMATICS & DIGITAL TWIN PIPELINE")
-    print("Welcome to the Interactive Master Orchestrator.")
-    print("This script will guide you through the execution of the entire pipeline.")
+    logger.info("This script will guide you through the execution of the entire pipeline.")
     
     pipeline_steps = [
         # Phase 1
@@ -75,14 +78,14 @@ def main():
     
     for command, description in pipeline_steps:
         if not run_all:
-            print(f"\nNext Step: {description}")
+            logger.info("\nNext Step: %s", description)
             choice = input("Do you want to run this step? [y=yes, n=skip, a=run all remaining, q=quit]: ").strip().lower()
             
             if choice == 'q':
-                print("Exiting pipeline orchestrator.")
+                logger.info("Exiting pipeline orchestrator.")
                 sys.exit(0)
             elif choice == 'n':
-                print(f"Skipping: {description}")
+                logger.info("Skipping: %s", description)
                 continue
             elif choice == 'a':
                 run_all = True
@@ -90,25 +93,31 @@ def main():
         success = run_command(command, description)
         if not success:
             choice = input("\nStep failed or was interrupted. Do you want to continue to the next step? [y/n]: ").strip().lower()
-            if choice != 'y':
-                print("Exiting pipeline orchestrator due to failure.")
+            if choice.lower() != 'y':
+                logger.error("Exiting pipeline orchestrator due to failure.")
                 sys.exit(1)
                 
     print_header("PIPELINE PROCESSING COMPLETE")
     
-    print("\nNext, you can launch the interactive applications (these run continuously).")
+    logger.info("\nNext, you can launch the interactive applications (these run continuously).")
     
-    launch_dash = input("Do you want to launch the Streamlit Dashboard? [y/n]: ").strip().lower()
-    if launch_dash == 'y':
-        print("\nStarting Streamlit Dashboard... (Press Ctrl+C to stop)")
-        subprocess.run(["streamlit", "run", "codes/code_16_dashboard.py"])
+    dashboard_choice = input("Do you want to launch the Streamlit Dashboard? [y/n]: ").strip().lower()
+    if dashboard_choice == 'y':
+        logger.info("\nStarting Streamlit Dashboard... (Press Ctrl+C to stop)")
+        try:
+            subprocess.run(["streamlit", "run", "codes/code_16_dashboard.py"])
+        except KeyboardInterrupt:
+            pass
         
-    launch_api = input("\nDo you want to launch the FastAPI Backend Server? [y/n]: ").strip().lower()
-    if launch_api == 'y':
-        print("\nStarting FastAPI Server... (Press Ctrl+C to stop)")
-        subprocess.run(["uvicorn", "codes.backend_api:app", "--reload"])
+    api_choice = input("\nDo you want to launch the FastAPI backend? [y/n]: ").strip().lower()
+    if api_choice == 'y':
+        logger.info("\nStarting FastAPI Server... (Press Ctrl+C to stop)")
+        try:
+            subprocess.run(["uvicorn", "codes.backend_api:app", "--reload"])
+        except KeyboardInterrupt:
+            pass
         
-    print("\nThank you for using the Polymer Informatics Pipeline!")
+    logger.info("\nThank you for using the Polymer Informatics Pipeline!")
 
 if __name__ == "__main__":
     # Ensure we run from the project root

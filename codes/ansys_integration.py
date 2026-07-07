@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+from codes.reproducibility import enforce_reproducibility
+enforce_reproducibility(42)
 # In a real environment, you would import ansys.mapdl.core
 # from ansys.mapdl.core import launch_mapdl
 from resource_manager import managed_ansys_job

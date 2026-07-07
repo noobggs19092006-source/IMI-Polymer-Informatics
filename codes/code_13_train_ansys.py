@@ -54,7 +54,8 @@ except ImportError:
     warnings.warn("XGBoost not found. Running 2-way ensemble (MLP + GBR).", ImportWarning)
 
 import config
-from dataset_composition_manager import DatasetCompositionManager, CrossValidationByMaterialClass
+from codes.dataset_composition_manager import DatasetCompositionManager
+from codes.cross_validation import CrossValidationByMaterialClass, MaterialClass
 from reproducibility import enforce_reproducibility, DeterministicPipeline
 
 # ── Enforce reproducibility immediately ───────────────────────────────────────

@@ -179,19 +179,25 @@ class TargetAnalyzer:
 
 
 if __name__ == "__main__":
-    csv_path = "../results/ansys_simulation_results.csv"
-    if os.path.exists(csv_path):
+    from pathlib import Path
+    from codes.logger_setup import PipelineLogger
+    import logging
+    logger = logging.getLogger(__name__)
+
+    _REPO_ROOT = Path(__file__).resolve().parent.parent
+    csv_path = _REPO_ROOT / "results" / "ansys_simulation_results.csv"
+    output_path = _REPO_ROOT / "results" / "target_achievement_analysis.txt"
+
+    if csv_path.exists():
         df = pd.read_csv(csv_path)
         if "sim_status" in df.columns:
             df = df[df["sim_status"] == "Success"]
 
         if len(df) > 0:
             analyzer = TargetAnalyzer(df)
-            analyzer.generate_diagnostic_report("../results/target_achievement_analysis.txt")
-            print(
-                "Target achievement analysis generated at ../results/target_achievement_analysis.txt"
-            )
+            analyzer.generate_diagnostic_report(str(output_path))
+            logger.info("Target achievement analysis generated at %s", output_path)
         else:
-            print("No successful simulations found to analyze.")
+            logger.warning("No successful simulations found to analyze.")
     else:
-        print(f"Data file not found: {csv_path}")
+        logger.error("Data file not found: %s", csv_path)

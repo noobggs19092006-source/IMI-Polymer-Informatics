@@ -6,15 +6,10 @@ import os
 import json
 
 
-class MaterialClass(Enum):
-    """Explicitly define material classes."""
+from codes.cross_validation import MaterialClass
 
-    PURE_POLYMER = "pure_polymer"
-    POLYMER_ALLOY = "polymer_alloy"
-    NANOCOMPOSITE = "nanocomposite"
-    FILLED_POLYMER = "filled_polymer"
-
-
+from codes.reproducibility import enforce_reproducibility
+enforce_reproducibility(42)
 class DatasetCompositionManager:
     """Enforce strict dataset composition controls."""
 
@@ -107,29 +102,3 @@ class DatasetCompositionManager:
                 f.write(f"  {mat_class:.<40} {status}\n")
 
 
-class CrossValidationByMaterialClass:
-    """Validate model performance across material classes."""
-
-    @staticmethod
-    def evaluate_per_material_class(df: pd.DataFrame, y_true, y_pred) -> Dict:
-        from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-
-        metrics_by_class = {}
-
-        classes = df["material_class"].unique()
-        for mat_class in classes:
-            mask = (df["material_class"] == mat_class).values
-            if mask.sum() < 2:
-                continue
-
-            y_true_class = y_true[mask]
-            y_pred_class = y_pred[mask]
-
-            metrics_by_class[mat_class] = {
-                "sample_count": int(mask.sum()),
-                "r2_score": float(r2_score(y_true_class, y_pred_class)),
-                "mae": float(mean_absolute_error(y_true_class, y_pred_class)),
-                "rmse": float(np.sqrt(mean_squared_error(y_true_class, y_pred_class))),
-            }
-
-        return metrics_by_class

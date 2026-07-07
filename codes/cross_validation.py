@@ -9,55 +9,25 @@ logger = logging.getLogger(__name__)
 
 
 class MaterialClass(Enum):
-    POLYMER_BLEND = "Polymer_Blend"
-    ALLOY = "Alloy"
-    NANOCOMPOSITE = "Nanocomposite"
-
+    PURE_POLYMER = 'pure_polymer'
+    POLYMER_ALLOY = 'polymer_alloy'
+    NANOCOMPOSITE = 'nanocomposite'
+    FILLED_POLYMER = 'filled_polymer'
+    POLYMER_BLEND = 'Polymer_Blend'
+    ALLOY = 'Alloy'
 
 class CrossValidationByMaterialClass:
-    """Validate model performance across material classes with statistical testing."""
-
-    def evaluate_per_material_class(self, df: pd.DataFrame, y_true, y_pred) -> Dict[str, Any]:
-        """Calculate metrics with confidence intervals."""
+    @staticmethod
+    def evaluate_per_material_class(df, y_true, y_pred):
         from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
-
-        metrics_by_class = {}
-
-        for mat_class in MaterialClass:
-            mask = df["Material_Type"] == mat_class.value
-
-            if mask.sum() < 10:  # Need minimum samples for statistics
-                logger.warning(f"{mat_class.value}: Only {mask.sum()} samples, skipping")
-                continue
-
-            y_true_class = y_true[mask]
-            y_pred_class = y_pred[mask]
-
-            # Calculate metrics
-            r2 = r2_score(y_true_class, y_pred_class)
-            mae = mean_absolute_error(y_true_class, y_pred_class)
-            rmse = np.sqrt(mean_squared_error(y_true_class, y_pred_class))
-
-            # Calculate confidence intervals using bootstrap
-            ci_r2 = self._bootstrap_ci(y_true_class, y_pred_class, r2_score, n_boot=1000)
-            ci_mae = self._bootstrap_ci(
-                y_true_class, y_pred_class, mean_absolute_error, n_boot=1000
-            )
-
-            metrics_by_class[mat_class.value] = {
-                "sample_count": mask.sum(),
-                "r2_score": r2,
-                "r2_ci_lower": ci_r2[0],
-                "r2_ci_upper": ci_r2[1],
-                "mae": mae,
-                "mae_ci_lower": ci_mae[0],
-                "mae_ci_upper": ci_mae[1],
-                "rmse": rmse,
-                "mean_target": float(y_true_class.mean()),
-                "std_target": float(y_true_class.std()),
-            }
-
-        return metrics_by_class
+        import numpy as np
+        metrics = {}
+        if 'material_class' not in df.columns: return metrics
+        for c in df['material_class'].unique():
+            m = (df['material_class'] == c).values
+            if m.sum() < 2: continue
+            metrics[c] = {'sample_count': int(m.sum()), 'r2_score': float(r2_score(y_true[m], y_pred[m])), 'mae': float(mean_absolute_error(y_true[m], y_pred[m])), 'rmse': float(np.sqrt(mean_squared_error(y_true[m], y_pred[m])))}
+        return metrics
 
     @staticmethod
     def _bootstrap_ci(y_true, y_pred, metric_func, n_boot: int = 1000, ci: float = 0.95):

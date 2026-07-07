@@ -4,6 +4,8 @@ import logging
 from contextlib import contextmanager
 from pathlib import Path
 
+from codes.reproducibility import enforce_reproducibility
+enforce_reproducibility(42)
 logger = logging.getLogger(__name__)
 
 

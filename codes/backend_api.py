@@ -24,6 +24,9 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 from codes.ansys_bridge import run_live_ansys_simulation
+from codes.reproducibility import enforce_reproducibility
+
+enforce_reproducibility(42)
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -37,7 +40,6 @@ app = FastAPI(title="Polymer Informatics API", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -128,8 +130,8 @@ def health_check() -> dict:
 @app.get("/api/models")
 def get_models() -> list:
     return [
-        {"id": "ensemble", "name": "3-Way Ensemble", "r2": 0.9558},
-        {"id": "gnn", "name": "Graph Neural Network", "r2": 0.9528},
+        {"id": "ensemble", "name": "3-Way Ensemble", "r2": "~0.95 (Target)"},
+        {"id": "gnn", "name": "Graph Neural Network", "r2": "~0.95 (Target)"},
     ]
 
 
